@@ -1,0 +1,42 @@
+- hosts: dev
+  become: true
+
+  tasks:
+
+  - name: validating a  condition based on a command
+    shell: |
+          cat /etc/passwd | grep -i nologin
+    register: result
+      
+  - name: Validating the operating system
+    block: 
+ 
+      - name: installing packages
+        yum:
+          name: ['httpd','httpd-tools']
+          state: "installed"
+  
+      - name: copying the index.html
+        copy:
+          src: "index.html"
+          dest: "/var/www/html/"
+  
+      - name: copying the template
+        template:
+          src: "httpd.conf.j2"
+          dest: "/etc/httpd/conf/httpd.conf"
+        notify: apache
+  
+      - name: Starting the service 
+        service:
+          name: "httpd"
+          state: "started"
+
+    when: ( ansible_os_family == "RedHat" and 'bash' in result.stdout  )
+  
+  handlers:
+    - name: apache
+      service: 
+        name: "httpd"
+        state: "restarted"
+    

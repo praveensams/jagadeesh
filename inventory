@@ -1,0 +1,7 @@
+[dev]
+hash ansible_ssh_host=192.168.33.220 ansible_ssh_user=vagrant ports=4040
+
+
+[dev:vars]
+location="/mnt"
+ports=8080
